@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Component tests for the Tiptap wiki editor.
  *

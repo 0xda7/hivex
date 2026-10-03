@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Round-trip tests for the hivebot-specific insert shapes.
  *
