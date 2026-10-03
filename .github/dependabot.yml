@@ -1,25 +1,7 @@
 version: 2
-# Grant Dependabot read access to private GitHub repos in the org.
-# Required because workflows under .github/workflows/ consume reusable
-# workflows from the private hive-crm/.github repo (see `uses:
-# hive-crm/.github/...` refs). Without this, every weekly Dependabot
-# run fails closed with `git_dependencies_not_reachable`.
-#
-# `DEPENDABOT_PRIVATE_REPO_TOKEN` is provisioned at the org level —
-# see hive-crm/docs#37 for the original rollout + the gh command to
-# create it.
-registries:
-  hive-crm-github:
-    type: git
-    url: https://github.com
-    username: x-access-token
-    password: ${{secrets.DEPENDABOT_PRIVATE_REPO_TOKEN}}
-
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
-    registries:
-      - hive-crm-github
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
@@ -47,7 +29,9 @@ updates:
       include: "scope"
 
   # Root: dev-only tooling (secretlint, commitlint, @secretlint rule presets).
-  - package-ecosystem: "npm"
+  # Bun-managed (bun.lock, no package-lock.json) — the npm_and_yarn updater
+  # fails closed on bun.lock; the bun ecosystem is the supported path.
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "monthly"
@@ -61,10 +45,8 @@ updates:
       prefix: "chore"
       include: "scope"
 
-  # Web frontend (React/vite). Uses bun.lock locally; dependabot reads
-  # package.json directly. Without this entry, biome / vitest / vite /
-  # tailwind bumps land manually only.
-  - package-ecosystem: "npm"
+  # Web frontend (React/vite), managed with bun.lock — bun ecosystem.
+  - package-ecosystem: "bun"
     directory: "/web"
     schedule:
       interval: "monthly"
@@ -78,9 +60,9 @@ updates:
       prefix: "chore(web)"
       include: "scope"
 
-  # Playwright e2e harness. Self-contained workspace under web/e2e/ so
+  # Playwright e2e harness. Self-contained bun workspace under web/e2e/ so
   # @playwright/test bumps don't entangle the main web build.
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/web/e2e"
     schedule:
       interval: "monthly"
