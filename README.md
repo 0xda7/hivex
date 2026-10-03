@@ -1,6 +1,6 @@
 # Hivex
 
-[![CI](https://github.com/Northlatch-Labs-LLC/hivex/actions/workflows/ci.yml/badge.svg)](https://github.com/Northlatch-Labs-LLC/hivex/actions/workflows/ci.yml)
+[![CI](https://github.com/0xda7/hivex/actions/workflows/ci.yml/badge.svg)](https://github.com/0xda7/hivex/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)](https://go.dev)
 [![React](https://img.shields.io/badge/Office_UI-React-61dafb?logo=react&logoColor=white)](web)
@@ -69,7 +69,7 @@ Requirements: Go ≥ 1.25 (Node ≥ 20 only if you touch `web/`).
 
 ```bash
 go build ./cmd/hivex
-./hivebot                       # office opens at http://127.0.0.1:7891
+./hivex                         # office opens at http://127.0.0.1:7891
 ```
 
 1. **Add inference.** Office → Settings → Credentials → API Keys. Add a
@@ -137,7 +137,7 @@ scripts/            packaging, incl. macOS Hive.app builder
   against credential exfiltration patterns.
 
 Report vulnerabilities privately via
-[GitHub Security Advisories](https://github.com/Northlatch-Labs-LLC/hivex/security/advisories/new).
+[GitHub Security Advisories](https://github.com/0xda7/hivex/security/advisories/new).
 
 ## Third-party notices
 
