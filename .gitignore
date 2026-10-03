@@ -141,3 +141,8 @@ hivex-home/.hivex/logs/
 /TODOS.md
 /CLAUDE.md
 /TESTING-WIKI.md
+
+# Local-only nested repos — were committed as gitlinks with no .gitmodules
+# (unfetchable for cloners; break checkout v7 submodule cleanup)
+/9router
+/hivex-home/.hivex/wiki/
