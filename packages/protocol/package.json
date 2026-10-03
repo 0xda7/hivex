@@ -23,14 +23,14 @@
     "check:invariants": "bash scripts/check-invariants.sh"
   },
   "dependencies": {
-    "canonicalize": "3.0.0"
+    "canonicalize": "5.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.15",
-    "@types/node": "^25.9.1",
-    "@vitest/coverage-v8": "2.1.9",
-    "fast-check": "^4.7.0",
-    "typescript": "^6.0.3",
-    "vitest": "2.1.9"
+    "@biomejs/biome": "2.5.13",
+    "@types/node": "^26.5.1",
+    "@vitest/coverage-v8": "5.0.0",
+    "fast-check": "^4.10.0",
+    "typescript": "^7.0.2",
+    "vitest": "5.0.0"
   }
 }
