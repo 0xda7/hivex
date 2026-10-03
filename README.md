@@ -124,7 +124,7 @@ scripts/            packaging, incl. macOS Hive.app builder
 | R1 | Local product gaps (persistence, de-mutation, SEV1 alerts) | in progress |
 | R2 | Domain-ready office (public-host allowlist, deploy artifacts) | next |
 | R3 | Production deployment | planned |
-| R4 | Citizen provisioning — machines + inference keys per agent-citizen | planned |
+| R4 | Citizen provisioning — machines + inference keys per agent-citizen | in progress (provisioning primitive shipped) |
 | R5 | Suite modernization | planned |
 
 ## Security
