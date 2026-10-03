@@ -21,10 +21,9 @@ vi.mock("../../hooks/useFirstRunNudge", () => ({
 // isTurnInFlight predicate is kept (importActual) so the dot's contract is
 // still exercised against the shipped logic.
 vi.mock("../../hooks/useTurnsLive", async () => {
-  const actual =
-    await vi.importActual<typeof import("../../hooks/useTurnsLive")>(
-      "../../hooks/useTurnsLive",
-    );
+  const actual = await vi.importActual<
+    typeof import("../../hooks/useTurnsLive")
+  >("../../hooks/useTurnsLive");
   return {
     ...actual,
     useTurnsLive: vi.fn(() => ({ data: {} })),

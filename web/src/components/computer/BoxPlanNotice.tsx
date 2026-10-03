@@ -31,7 +31,8 @@ export function BoxPlanNotice({
       data-testid="box-plan-notice"
     >
       <p className="box-plan-notice-text">
-        <strong>Your Gridframe Cloud account cannot start a box yet.</strong> {reason}
+        <strong>Your Gridframe Cloud account cannot start a box yet.</strong>{" "}
+        {reason}
         {account.trialLine ? ` Trial limits: ${account.trialLine}.` : ""}
       </p>
       <a

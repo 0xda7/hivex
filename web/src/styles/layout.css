@@ -309,7 +309,9 @@ html[data-theme="hive"] .sidebar.sidebar-collapsed .sidebar-icon-btn.is-open,
 html[data-theme="hive"]
   .sidebar.sidebar-collapsed
   .sidebar-rail-bottom:hover:not(.active),
-html[data-theme="hive"] .sidebar.sidebar-collapsed .sidebar-rail-bottom.is-open {
+html[data-theme="hive"]
+  .sidebar.sidebar-collapsed
+  .sidebar-rail-bottom.is-open {
   background: var(--hive-sidebar-hover);
   color: var(--hive-sidebar-text-active);
 }

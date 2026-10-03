@@ -28,18 +28,27 @@ function signersFor(tier: string): string[] {
 function useDecide() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (v: { itemId: string; tier: string; decision: "approve" | "reject" | "defer" }) =>
+    mutationFn: (v: {
+      itemId: string;
+      tier: string;
+      decision: "approve" | "reject" | "defer";
+    }) =>
       postGridframeDecide(v.itemId, v.decision, {
         signers: signersFor(v.tier),
         human: true,
       }),
     onSuccess: (res) => {
-      showNotice(`Decision recorded: ${res.item_id} → ${res.status}`, "success");
+      showNotice(
+        `Decision recorded: ${res.item_id} → ${res.status}`,
+        "success",
+      );
       void queryClient.invalidateQueries({ queryKey: DIGEST_QUERY_KEY });
     },
     onError: (err) => {
       showNotice(
-        err instanceof ApiError ? err.message : "Decision failed — broker unreachable",
+        err instanceof ApiError
+          ? err.message
+          : "Decision failed — broker unreachable",
         "error",
       );
     },
@@ -64,7 +73,9 @@ export function ApprovalsRoute() {
       </header>
       <div style={{ padding: "0 20px 20px", overflowX: "auto" }}>
         {digestQuery.isPending ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>Loading…</div>
+          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
+            Loading…
+          </div>
         ) : digestQuery.isError ? (
           <div role="alert" style={{ color: "var(--red)", fontSize: 13 }}>
             Could not load the queue:{" "}
@@ -73,11 +84,16 @@ export function ApprovalsRoute() {
               : "broker unreachable"}
           </div>
         ) : rows.length === 0 ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }} data-testid="approvals-empty">
+          <div
+            style={{ color: "var(--text-tertiary)", fontSize: 13 }}
+            data-testid="approvals-empty"
+          >
             Nothing waiting on a human decision.
           </div>
         ) : (
-          <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}>
+          <table
+            style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}
+          >
             <thead>
               <tr style={{ textAlign: "left", color: "var(--text-secondary)" }}>
                 <th style={{ padding: 6 }}>Item</th>
@@ -115,10 +131,18 @@ export function ApprovalsRoute() {
                         className={`btn ${act === "approve" ? "btn-primary" : ""}`}
                         style={{ marginRight: 4 }}
                         onClick={() =>
-                          decide.mutate({ itemId: d.row.item_id, tier: d.row.tier, decision: act })
+                          decide.mutate({
+                            itemId: d.row.item_id,
+                            tier: d.row.tier,
+                            decision: act,
+                          })
                         }
                       >
-                        {act === "approve" ? "Approve" : act === "reject" ? "Reject" : "Defer"}
+                        {act === "approve"
+                          ? "Approve"
+                          : act === "reject"
+                            ? "Reject"
+                            : "Defer"}
                       </button>
                     ))}
                   </td>
@@ -144,19 +168,34 @@ export function ComplianceRoute() {
       <header style={{ padding: "16px 20px 8px" }}>
         <h2 style={{ margin: 0, fontSize: 16 }}>Compliance timeline</h2>
         <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-          Overdue obligations render red; overdue fires a SEV2 exception (job #9)
+          Overdue obligations render red; overdue fires a SEV2 exception (job
+          #9)
         </span>
       </header>
-      <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 8, overflowY: "auto" }}>
+      <div
+        style={{
+          padding: "0 20px 20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          overflowY: "auto",
+        }}
+      >
         {q.isPending ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>Loading…</div>
+          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
+            Loading…
+          </div>
         ) : q.isError ? (
           <div role="alert" style={{ color: "var(--red)", fontSize: 13 }}>
             Could not load the calendar:{" "}
-            {q.error instanceof ApiError ? q.error.message : "broker unreachable"}
+            {q.error instanceof ApiError
+              ? q.error.message
+              : "broker unreachable"}
           </div>
         ) : items.length === 0 ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>No obligations tracked.</div>
+          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
+            No obligations tracked.
+          </div>
         ) : (
           items.map((it) => (
             <div
@@ -172,15 +211,20 @@ export function ComplianceRoute() {
               }}
             >
               <strong>{it.row.due_date}</strong> — {it.row.obligation}
-              {it.overdue ? " — OVERDUE" : ""} · {it.row.authority} · owner {it.row.owner} ·{" "}
-              {it.row.status} · {it.row.recurrence}
+              {it.overdue ? " — OVERDUE" : ""} · {it.row.authority} · owner{" "}
+              {it.row.owner} · {it.row.status} · {it.row.recurrence}
             </div>
           ))
         )}
         {q.data && q.data.open_exceptions.length > 0 ? (
           <div
             data-testid="compliance-exceptions"
-            style={{ fontSize: 12, color: "var(--text-secondary)", borderTop: "1px solid var(--border)", paddingTop: 8 }}
+            style={{
+              fontSize: 12,
+              color: "var(--text-secondary)",
+              borderTop: "1px solid var(--border)",
+              paddingTop: 8,
+            }}
           >
             Open exceptions:{" "}
             {q.data.open_exceptions

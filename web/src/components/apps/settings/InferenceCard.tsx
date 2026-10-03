@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { verifyZaiKey, type ConfigSnapshot } from "../../../api/client";
+import { type ConfigSnapshot, verifyZaiKey } from "../../../api/client";
 
 /**
  * The Inference card — the one place that answers "what is my company
@@ -43,9 +43,15 @@ export function InferenceCard({ cfg }: { cfg: ConfigSnapshot }) {
       <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>
         Inference
       </h2>
-      <p style={{ fontSize: 12, color: "var(--text-tertiary)", margin: "0 0 8px 0" }}>
-        Every runtime your agents bill, with the key fingerprint (never the
-        key) and tokens metered on this install.
+      <p
+        style={{
+          fontSize: 12,
+          color: "var(--text-tertiary)",
+          margin: "0 0 8px 0",
+        }}
+      >
+        Every runtime your agents bill, with the key fingerprint (never the key)
+        and tokens metered on this install.
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {rows.map((row) => (
@@ -66,7 +72,9 @@ export function InferenceCard({ cfg }: { cfg: ConfigSnapshot }) {
               <div style={{ fontWeight: 600, fontSize: 13 }}>
                 {row.label ?? row.kind}
                 {row.agents > 0 ? (
-                  <span style={{ color: "var(--text-tertiary)", fontWeight: 400 }}>
+                  <span
+                    style={{ color: "var(--text-tertiary)", fontWeight: 400 }}
+                  >
                     {" "}
                     · {row.agents} agent{row.agents > 1 ? "s" : ""}
                   </span>
@@ -75,7 +83,8 @@ export function InferenceCard({ cfg }: { cfg: ConfigSnapshot }) {
               <div style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
                 {row.key_fingerprint
                   ? `key ${row.key_fingerprint} · ${row.key_source ?? ""}`
-                  : (row.auth ?? (row.key_set === false ? "no key configured" : ""))}
+                  : (row.auth ??
+                    (row.key_set === false ? "no key configured" : ""))}
                 {row.default_model ? ` · ${row.default_model}` : ""}
               </div>
             </div>
@@ -134,7 +143,9 @@ export function ZaiKeyVerifyRow({ enteredKey }: { enteredKey?: string }) {
           style={{
             fontSize: 12,
             margin: "6px 0 0 0",
-            color: result.startsWith("✓") ? "var(--text-secondary)" : "var(--red)",
+            color: result.startsWith("✓")
+              ? "var(--text-secondary)"
+              : "var(--red)",
             fontFamily: "var(--font-mono, monospace)",
           }}
         >

@@ -197,7 +197,10 @@ describe("<ComputerTab> phases", () => {
     expect(await screen.findByTestId("box-signin")).toBeInTheDocument();
 
     await user.click(screen.getByTestId("box-paste"));
-    await user.type(screen.getByLabelText("Gridframe Cloud API key"), "box_abc");
+    await user.type(
+      screen.getByLabelText("Gridframe Cloud API key"),
+      "box_abc",
+    );
     await user.click(screen.getByRole("button", { name: "Save key" }));
 
     await waitFor(() =>

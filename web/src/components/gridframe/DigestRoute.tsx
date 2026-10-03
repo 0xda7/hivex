@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   ApiError,
+  type GridframeDigestItem,
   getGridframeDigest,
   postGridframeDecide,
-  type GridframeDigestItem,
 } from "../../api/client";
 import { showNotice } from "../ui/Toast";
 
@@ -30,7 +30,11 @@ function DecisionCard({
   busy,
 }: {
   item: GridframeDigestItem;
-  onDecide: (itemId: string, tier: string, decision: "approve" | "reject" | "defer") => void;
+  onDecide: (
+    itemId: string,
+    tier: string,
+    decision: "approve" | "reject" | "defer",
+  ) => void;
   busy: boolean;
 }) {
   const { row } = item;
@@ -46,11 +50,23 @@ function DecisionCard({
         gap: 8,
       }}
     >
-      <div style={{ display: "flex", gap: 8, alignItems: "baseline", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          alignItems: "baseline",
+          flexWrap: "wrap",
+        }}
+      >
         <strong style={{ fontSize: 13 }}>{row.description}</strong>
         <span
           data-testid={`digest-tier-${row.item_id}`}
-          style={{ fontSize: 11, padding: "1px 6px", borderRadius: 4, background: "var(--bg-subtle)" }}
+          style={{
+            fontSize: 11,
+            padding: "1px 6px",
+            borderRadius: 4,
+            background: "var(--bg-subtle)",
+          }}
         >
           {row.tier}
         </span>
@@ -61,8 +77,8 @@ function DecisionCard({
         ) : null}
       </div>
       <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-        {row.dept} · raised {row.raised_date} by {row.raised_by} · cost of delay $
-        {item.cost_of_delay_usd.toFixed(2)}/wk · needs {row.approver}
+        {row.dept} · raised {row.raised_date} by {row.raised_by} · cost of delay
+        ${item.cost_of_delay_usd.toFixed(2)}/wk · needs {row.approver}
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         {(["approve", "reject", "defer"] as const).map((d) => (
@@ -90,18 +106,27 @@ export function DigestRoute() {
   });
 
   const decide = useMutation({
-    mutationFn: (v: { itemId: string; tier: string; decision: "approve" | "reject" | "defer" }) =>
+    mutationFn: (v: {
+      itemId: string;
+      tier: string;
+      decision: "approve" | "reject" | "defer";
+    }) =>
       postGridframeDecide(v.itemId, v.decision, {
         signers: signersFor(v.tier),
         human: true,
       }),
     onSuccess: (res) => {
-      showNotice(`Decision recorded: ${res.item_id} → ${res.status}`, "success");
+      showNotice(
+        `Decision recorded: ${res.item_id} → ${res.status}`,
+        "success",
+      );
       void queryClient.invalidateQueries({ queryKey: DIGEST_QUERY_KEY });
     },
     onError: (err) => {
       showNotice(
-        err instanceof ApiError ? err.message : "Decision failed — broker unreachable",
+        err instanceof ApiError
+          ? err.message
+          : "Decision failed — broker unreachable",
         "error",
       );
     },
@@ -110,7 +135,14 @@ export function DigestRoute() {
   const digest = digestQuery.data;
   return (
     <div className="app-panel active" data-testid="digest-route">
-      <header style={{ padding: "16px 20px 8px", display: "flex", gap: 12, alignItems: "baseline" }}>
+      <header
+        style={{
+          padding: "16px 20px 8px",
+          display: "flex",
+          gap: 12,
+          alignItems: "baseline",
+        }}
+      >
         <h2 style={{ margin: 0, fontSize: 16 }}>Principal digest</h2>
         {digest ? (
           <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
@@ -118,9 +150,19 @@ export function DigestRoute() {
           </span>
         ) : null}
       </header>
-      <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto" }}>
+      <div
+        style={{
+          padding: "0 20px 20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          overflowY: "auto",
+        }}
+      >
         {digestQuery.isPending ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>Loading digest…</div>
+          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
+            Loading digest…
+          </div>
         ) : digestQuery.isError ? (
           <div role="alert" style={{ color: "var(--red)", fontSize: 13 }}>
             Could not load digest:{" "}
@@ -129,7 +171,10 @@ export function DigestRoute() {
               : "broker unreachable"}
           </div>
         ) : !digest || digest.decisions.length === 0 ? (
-          <div style={{ color: "var(--text-tertiary)", fontSize: 13 }} data-testid="digest-empty">
+          <div
+            style={{ color: "var(--text-tertiary)", fontSize: 13 }}
+            data-testid="digest-empty"
+          >
             No pending T2/T3 decisions today.
           </div>
         ) : (

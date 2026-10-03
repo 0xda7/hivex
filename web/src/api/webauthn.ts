@@ -1,3 +1,11 @@
+import type {
+  ApprovalClaim,
+  ApprovalClaimJsonValue,
+  ApprovalRole,
+  ApprovalScope,
+  ApprovalScopeJsonValue,
+  SignedApprovalTokenJsonValue,
+} from "@hivex/protocol";
 import {
   type AuthenticationResponseJSON,
   browserSupportsWebAuthn,
@@ -7,14 +15,6 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
-import type {
-  ApprovalClaim,
-  ApprovalClaimJsonValue,
-  ApprovalRole,
-  ApprovalScope,
-  ApprovalScopeJsonValue,
-  SignedApprovalTokenJsonValue,
-} from "@hivex/protocol";
 
 import { ApiError, post } from "./client";
 

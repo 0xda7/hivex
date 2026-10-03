@@ -1196,10 +1196,15 @@ export function getProviderModels(kind: string) {
 
 /** Verify a Z.ai key with a real 1-token call; a fresh valid key is saved. */
 export function verifyZaiKey(apiKey: string) {
-  return post<{ ok: boolean; error?: string; status?: number; latency_ms?: number; model?: string; fingerprint?: string; saved?: boolean }>(
-    "/zai-key/verify",
-    { api_key: apiKey },
-  );
+  return post<{
+    ok: boolean;
+    error?: string;
+    status?: number;
+    latency_ms?: number;
+    model?: string;
+    fingerprint?: string;
+    saved?: boolean;
+  }>("/zai-key/verify", { api_key: apiKey });
 }
 
 export function getConfig() {
@@ -1423,7 +1428,9 @@ export interface GridframeCompliance {
 }
 
 export function getGridframeCompliance(signal?: AbortSignal) {
-  return get<GridframeCompliance>("/gridframe/compliance", undefined, { signal });
+  return get<GridframeCompliance>("/gridframe/compliance", undefined, {
+    signal,
+  });
 }
 
 // ── Gridframe G4: Board register tabs (gridframe api.go) ──
@@ -1442,10 +1449,18 @@ export const GRIDFRAME_REGISTER_TABLES = [
   "exception-log",
   "aei-monthly",
 ] as const;
-export type GridframeRegisterTableName = (typeof GRIDFRAME_REGISTER_TABLES)[number];
+export type GridframeRegisterTableName =
+  (typeof GRIDFRAME_REGISTER_TABLES)[number];
 
-export function getGridframeRegister(table: GridframeRegisterTableName, signal?: AbortSignal) {
-  return get<GridframeRegisterTable>(`/gridframe/register/${table}`, undefined, { signal });
+export function getGridframeRegister(
+  table: GridframeRegisterTableName,
+  signal?: AbortSignal,
+) {
+  return get<GridframeRegisterTable>(
+    `/gridframe/register/${table}`,
+    undefined,
+    { signal },
+  );
 }
 
 export function postGridframeRegisterRow(
@@ -1454,16 +1469,23 @@ export function postGridframeRegisterRow(
   opts: { reverse_of?: string } = {},
   signal?: AbortSignal,
 ) {
-  return post<unknown>(`/gridframe/register/${table}/rows`, { values, ...opts }, { signal });
+  return post<unknown>(
+    `/gridframe/register/${table}/rows`,
+    { values, ...opts },
+    { signal },
+  );
 }
 
 /** Fetch a register's CSV (byte parity with §5.1 seeds) as a Blob. */
-export function getGridframeExport(table: GridframeRegisterTableName, signal?: AbortSignal) {
+export function getGridframeExport(
+  table: GridframeRegisterTableName,
+  signal?: AbortSignal,
+) {
   return getBlob(`/gridframe/register/${table}/export`, { signal });
 }
 
+export * from "./catalog";
 // Feature modules extracted to keep this file inside the file-size budget
 // (scripts/check-file-size.sh). Re-exported so every consumer keeps
 // importing from "./client" — import sites are unchanged.
 export * from "./messages";
-export * from "./catalog";

@@ -4,8 +4,8 @@ import { useOfficeTasks } from "../hooks/useOfficeTasks";
 import { directChannelSlug } from "../lib/channels";
 import {
   appRoute,
-  appTaskDetailRoute,
   approvalsRoute,
+  appTaskDetailRoute,
   articleRoute,
   boardRoute,
   botDetailRoute,

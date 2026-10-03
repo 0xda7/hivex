@@ -33,9 +33,9 @@ import {
   INHERIT_MODEL_VALUE,
   isCatalogModel,
 } from "../../lib/modelCatalog";
-import { useProviderModels } from "../../lib/useProviderModels";
-import { FALLBACK_LLM_KINDS } from "../../lib/runtimeProviders";
 import { router } from "../../lib/router";
+import { FALLBACK_LLM_KINDS } from "../../lib/runtimeProviders";
+import { useProviderModels } from "../../lib/useProviderModels";
 import { useAppStore } from "../../stores/app";
 import { HarnessBadge } from "../ui/HarnessBadge";
 import { PixelAvatar } from "../ui/PixelAvatar";
@@ -481,11 +481,13 @@ function ModelPicker({
         }}
         style={{ flex: customMode ? "0 0 130px" : 1 }}
       >
-        {options.map((o: { value: string; label: string; discovered?: boolean }) => (
-          <option key={o.value || "default"} value={o.value}>
-            {o.label}
-          </option>
-        ))}
+        {options.map(
+          (o: { value: string; label: string; discovered?: boolean }) => (
+            <option key={o.value || "default"} value={o.value}>
+              {o.label}
+            </option>
+          ),
+        )}
       </select>
       {customMode && (
         <input
@@ -530,7 +532,8 @@ function RuntimeSection({
     staleTime: 30_000,
   });
   const localStatuses: LocalProviderStatus[] = localStatusQuery.data ?? [];
-  const llmKinds: LLMRuntimeKind[] = configQuery.data?.llm_provider_kinds ?? FALLBACK_LLM_KINDS;
+  const llmKinds: LLMRuntimeKind[] =
+    configQuery.data?.llm_provider_kinds ?? FALLBACK_LLM_KINDS;
   const globalDefault = configQuery.data?.llm_provider ?? "claude-code";
 
   const binding = bindingFromMember(agent.provider);

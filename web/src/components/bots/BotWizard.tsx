@@ -18,8 +18,8 @@ import {
   INHERIT_MODEL_VALUE,
   isCatalogModel,
 } from "../../lib/modelCatalog";
-import { useProviderModels } from "../../lib/useProviderModels";
 import { FALLBACK_LLM_KINDS } from "../../lib/runtimeProviders";
+import { useProviderModels } from "../../lib/useProviderModels";
 
 // "inherit" is the wizard-only sentinel that maps to an absent ProviderBinding
 // in the POST body (the broker then falls back to the install-wide default at
@@ -143,11 +143,13 @@ function WizardModelPicker({
         }}
         style={{ flex: customMode ? "0 0 160px" : 1 }}
       >
-        {options.map((o: { value: string; label: string; discovered?: boolean }) => (
-          <option key={o.value || "default"} value={o.value}>
-            {o.label}
-          </option>
-        ))}
+        {options.map(
+          (o: { value: string; label: string; discovered?: boolean }) => (
+            <option key={o.value || "default"} value={o.value}>
+              {o.label}
+            </option>
+          ),
+        )}
       </select>
       {customMode && (
         <input
@@ -198,7 +200,8 @@ export function BotWizard({ open, onClose, onCreated }: BotWizardProps) {
     staleTime: 30_000,
   });
   const localStatuses: LocalProviderStatus[] = localStatusQuery.data ?? [];
-  const llmKinds: LLMRuntimeKind[] = configQuery.data?.llm_provider_kinds ?? FALLBACK_LLM_KINDS;
+  const llmKinds: LLMRuntimeKind[] =
+    configQuery.data?.llm_provider_kinds ?? FALLBACK_LLM_KINDS;
 
   async function handleGenerate() {
     const trimmed = prompt.trim();

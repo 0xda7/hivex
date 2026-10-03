@@ -29,12 +29,12 @@ import {
 } from "../ui/ShredWarning";
 import { showNotice } from "../ui/Toast";
 import { WipeModal } from "../ui/WipeModal";
-import { ImageGenSection } from "./SettingsApp.imageGen";
 import { CustomProvidersSection } from "./SettingsApp.customProviders";
-import { InferenceCard, ZaiKeyVerifyRow } from "./settings/InferenceCard";
+import { ImageGenSection } from "./SettingsApp.imageGen";
 import { BoxAccountSection } from "./settings/BoxAccountSection";
 import { Field, KeyField, SaveButton } from "./settings/components";
 import { SECTION_GROUPS } from "./settings/constants";
+import { InferenceCard, ZaiKeyVerifyRow } from "./settings/InferenceCard";
 import { PrivacySection } from "./settings/PrivacySection";
 import { RuntimeProviderChecklist } from "./settings/RuntimeProviderChecklist";
 import { styles } from "./settings/styles";
@@ -118,10 +118,7 @@ function TeamLeadPicker({
   );
 }
 
-function sameProviders(
-  a: readonly string[] | null,
-  b: readonly string[],
-) {
+function sameProviders(a: readonly string[] | null, b: readonly string[]) {
   if (a === null) return false;
   return a.length === b.length && a.every((provider, i) => provider === b[i]);
 }
@@ -144,9 +141,9 @@ function GeneralSection({ cfg, save }: SectionProps) {
   );
   const [blueprint, setBlueprint] = useState(cfg.blueprint ?? "");
   const [email, setEmail] = useState(cfg.email ?? "");
-  const [connectedProviders, setConnectedProviders] = useState<
-    string[] | null
-  >(null);
+  const [connectedProviders, setConnectedProviders] = useState<string[] | null>(
+    null,
+  );
   const updateConnectedProviders = useCallback((next: string[]) => {
     setConnectedProviders((prev) => (sameProviders(prev, next) ? prev : next));
   }, []);

@@ -117,10 +117,9 @@ export function AppDemoTab({ appName, onHandoff, onTeach }: AppDemoTabProps) {
       <div className="opr-data-intro">
         <Eyebrow>Teach by demonstrating</Eyebrow>
         <p className="opr-scoped-note">
-          Show {appName} the job instead of describing it. While you work,
-          Hivex reads the screens you are actually on — the app, the window,
-          and the elements on it — then hands that to the chat, which writes the
-          tool.
+          Show {appName} the job instead of describing it. While you work, Hivex
+          reads the screens you are actually on — the app, the window, and the
+          elements on it — then hands that to the chat, which writes the tool.
         </p>
       </div>
 

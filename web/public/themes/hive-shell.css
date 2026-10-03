@@ -225,7 +225,10 @@ html[data-theme="hive-shell"] .notebook-surface {
   background-color: var(--nb-paper);
 }
 
-html[data-theme="hive-shell"] .notebook-surface .nb-shelf-item .nb-status-draft {
+html[data-theme="hive-shell"]
+  .notebook-surface
+  .nb-shelf-item
+  .nb-status-draft {
   color: var(--text-secondary);
 }
 html[data-theme="hive-shell"]

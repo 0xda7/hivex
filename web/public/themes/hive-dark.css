@@ -178,7 +178,10 @@ html[data-theme="hive-dark"] .notebook-surface {
 html[data-theme="hive-dark"] .notebook-surface .nb-shelf-item .nb-status-draft {
   color: var(--text-secondary);
 }
-html[data-theme="hive-dark"] .notebook-surface .nb-shelf-item .nb-status-review {
+html[data-theme="hive-dark"]
+  .notebook-surface
+  .nb-shelf-item
+  .nb-status-review {
   color: #ffb647;
 }
 html[data-theme="hive-dark"]

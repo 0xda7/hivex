@@ -5,8 +5,8 @@ import { useBotEventPeek } from "../../hooks/useBotEventPeek";
 import { useDefaultHarness } from "../../hooks/useConfig";
 import { useFirstRunNudge } from "../../hooks/useFirstRunNudge";
 import { useOfficeMembers } from "../../hooks/useMembers";
-import { isTurnInFlight, useTurnsLive } from "../../hooks/useTurnsLive";
 import { useOverflow } from "../../hooks/useOverflow";
+import { isTurnInFlight, useTurnsLive } from "../../hooks/useTurnsLive";
 import { AVATAR_MODE } from "../../lib/avatarMode";
 import { type HarnessKind, resolveHarness } from "../../lib/harness";
 import { router } from "../../lib/router";
@@ -52,9 +52,7 @@ function classifyActivity(member: OfficeMember | undefined) {
  * louder of the two meant the less useful thing.
  */
 function isWorking(member: OfficeMember, turnLive: boolean): boolean {
-  return (
-    (member.status || "").toLowerCase() === "active" || turnLive
-  );
+  return (member.status || "").toLowerCase() === "active" || turnLive;
 }
 
 interface SidebarBotRowProps {

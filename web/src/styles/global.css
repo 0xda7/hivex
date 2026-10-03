@@ -13,9 +13,6 @@
 }
 
 :root {
-  /* Developer-console mono stack: section labels, numerics, chrome. Themes
-     may override per-mode. */
-  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   /* Hive.System Figma ramps — mirrored here so first paint matches theme */
   --neutral-950: #1e1f1f;
   --neutral-900: #28292a;

@@ -28,10 +28,9 @@ vi.mock("../../hooks/useMembers", () => ({
 }));
 
 vi.mock("../../hooks/useTurnsLive", async () => {
-  const actual =
-    await vi.importActual<typeof import("../../hooks/useTurnsLive")>(
-      "../../hooks/useTurnsLive",
-    );
+  const actual = await vi.importActual<
+    typeof import("../../hooks/useTurnsLive")
+  >("../../hooks/useTurnsLive");
   return {
     ...actual,
     useTurnsLive: useTurnsLiveMock,

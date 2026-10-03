@@ -226,8 +226,8 @@ export function BoxCloudConnect({
       </div>
       {!signin.keySet ? (
         <p className="box-account-line" data-testid="box-plan-hint">
-          Computers run on your own Gridframe account at gridframes.app; you
-          pay Gridframe directly.{" "}
+          Computers run on your own Gridframe account at gridframes.app; you pay
+          Gridframe directly.{" "}
           <a
             href={BOX_BILLING_URL}
             target="_blank"
@@ -255,7 +255,8 @@ export function BoxCloudConnect({
           className="computer-card-text computer-card-text--error"
           data-testid="box-signin-error"
         >
-          {signin.error} Use Sign in to Gridframe Cloud to try again, or paste a key.
+          {signin.error} Use Sign in to Gridframe Cloud to try again, or paste a
+          key.
         </p>
       ) : null}
       {!signin.keySet ? (

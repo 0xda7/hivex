@@ -1,5 +1,3 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type {
   ApprovalClaim,
   ApprovalClaimJsonValue,
@@ -7,6 +5,8 @@ import type {
   ApprovalScopeJsonValue,
   SignedApprovalTokenJsonValue,
 } from "@hivex/protocol";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "../../api/client";

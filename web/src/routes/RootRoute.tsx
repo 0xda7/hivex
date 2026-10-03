@@ -488,7 +488,13 @@ function TasksRedirect() {
  */
 const FIRST_CLASS_APP_TARGETS: Record<
   FirstClassAppId,
-  "/wiki" | "/tasks" | "/agents" | "/digest" | "/approvals" | "/compliance" | "/board"
+  | "/wiki"
+  | "/tasks"
+  | "/agents"
+  | "/digest"
+  | "/approvals"
+  | "/compliance"
+  | "/board"
 > = {
   wiki: "/wiki",
   // The Inbox was consolidated into the board — send `/apps/inbox` straight

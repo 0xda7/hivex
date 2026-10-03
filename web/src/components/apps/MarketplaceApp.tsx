@@ -60,7 +60,9 @@ export function MarketplaceApp() {
         land in your workspace.
       </p>
       {list.isLoading && <p style={{ fontSize: 13 }}>Loading catalog…</p>}
-      {errMsg ? <p style={{ fontSize: 13, color: "var(--red)" }}>{errMsg}</p> : null}
+      {errMsg ? (
+        <p style={{ fontSize: 13, color: "var(--red)" }}>{errMsg}</p>
+      ) : null}
       {categories.map((cat) => {
         const items = entries.filter((e) => e.category === cat);
         if (items.length === 0) return null;

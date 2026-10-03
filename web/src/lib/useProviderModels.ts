@@ -1,9 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  type LocalProviderStatus,
-  getProviderModels,
-} from "../api/client";
+import { getProviderModels, type LocalProviderStatus } from "../api/client";
 import { modelOptionsForKind } from "./modelCatalog";
 
 /**
@@ -23,10 +20,7 @@ export function useProviderModels(
     staleTime: 60_000,
     retry: false,
   });
-  const catalog = modelOptionsForKind(
-    (kind ?? "") as never,
-    localStatuses,
-  );
+  const catalog = modelOptionsForKind((kind ?? "") as never, localStatuses);
   const live = (discovered.data?.models ?? []).filter(
     (m: string) => !catalog.some((c) => c.value === m),
   );
