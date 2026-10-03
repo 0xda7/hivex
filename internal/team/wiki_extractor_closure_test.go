@@ -333,10 +333,11 @@ func TestExtractionBatchesFactsPerEntity(t *testing.T) {
 		t.Fatalf("expected 3 JSONL lines (one per fact); got %d", lines)
 	}
 
-	// All three facts should live in a SINGLE commit — batch-per-entity.
+	// The fact log is runtime state, not content: all three facts land in
+	// one batched disk write, and none of it enters the article history.
 	commits := commitCountForPath(t, h.repo.Root(), factLogRel)
-	if commits != 1 {
-		t.Errorf("expected 1 commit for 3 same-entity facts (batched); got %d", commits)
+	if commits != 0 {
+		t.Errorf("fact log must stay out of the content history; got %d commits", commits)
 	}
 }
 

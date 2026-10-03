@@ -15,9 +15,10 @@ import (
 )
 
 // CommitEntityGraph writes the full graph log to team/entities/.graph.jsonl
-// and commits under the supplied author slug. Always replace-mode — the
-// EntityGraph builder in entity_graph.go merges existing bytes with the
-// new edges before calling this.
+// as runtime state — disk-only, never staged or committed (excluded by the
+// wiki root .gitignore); HEAD is reported for response-shape compatibility.
+// Always replace-mode — the EntityGraph builder in entity_graph.go merges
+// existing bytes with the new edges before calling this.
 func (r *Repo) CommitEntityGraph(ctx context.Context, slug, content, message string) (string, int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -39,33 +40,9 @@ func (r *Repo) CommitEntityGraph(ctx context.Context, slug, content, message str
 		return "", 0, fmt.Errorf("entity graph commit: write: %w", err)
 	}
 
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean); err != nil {
-		return "", 0, fmt.Errorf("entity graph commit: git add: %w: %s", err, out)
-	}
-
-	// Byte-identical rewrite → no commit. Report current HEAD.
-	cachedDiff, err := r.runGitLocked(ctx, slug, "diff", "--cached", "--name-only")
+	sha, err := r.headShortLocked(ctx, "entity graph commit")
 	if err != nil {
-		return "", 0, fmt.Errorf("entity graph commit: git diff --cached: %w", err)
+		return "", 0, err
 	}
-	if strings.TrimSpace(cachedDiff) == "" {
-		headSha, herr := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
-		if herr != nil {
-			return "", 0, fmt.Errorf("entity graph commit: resolve HEAD: %w", herr)
-		}
-		return strings.TrimSpace(headSha), len(content), nil
-	}
-
-	commitMsg := strings.TrimSpace(message)
-	if commitMsg == "" {
-		commitMsg = "graph: update " + clean
-	}
-	if out, err := r.runGitLocked(ctx, slug, "commit", "-q", "-m", commitMsg); err != nil {
-		return "", 0, fmt.Errorf("entity graph commit: git commit: %w: %s", err, out)
-	}
-	sha, err := r.runGitLocked(ctx, slug, "rev-parse", "--short", "HEAD")
-	if err != nil {
-		return "", 0, fmt.Errorf("entity graph commit: resolve HEAD: %w", err)
-	}
-	return strings.TrimSpace(sha), len(content), nil
+	return sha, len(content), nil
 }

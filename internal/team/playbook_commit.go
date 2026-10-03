@@ -85,7 +85,9 @@ func (r *Repo) CommitPlaybookSkill(ctx context.Context, slug, relPath, content, 
 	return strings.TrimSpace(sha), len(content), nil
 }
 
-// CommitPlaybookExecution appends-in-full to the jsonl execution log.
+// CommitPlaybookExecution appends-in-full to the jsonl execution log as
+// runtime state — disk-only, never staged or committed (excluded by the
+// wiki root .gitignore); HEAD is reported for response-shape compatibility.
 // Same "replace-with-merged-bytes" pattern as entity facts.
 func (r *Repo) CommitPlaybookExecution(ctx context.Context, slug, relPath, content, message string) (string, int, error) {
 	r.mu.Lock()
@@ -110,30 +112,10 @@ func (r *Repo) CommitPlaybookExecution(ctx context.Context, slug, relPath, conte
 	if err := os.WriteFile(fullPath, []byte(content), 0o600); err != nil {
 		return "", 0, fmt.Errorf("playbook execution: write: %w", err)
 	}
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean); err != nil {
-		return "", 0, fmt.Errorf("playbook execution: git add: %w: %s", err, out)
-	}
-	cachedDiff, err := r.runGitLocked(ctx, slug, "diff", "--cached", "--name-only")
+
+	sha, err := r.headShortLocked(ctx, "playbook execution")
 	if err != nil {
-		return "", 0, fmt.Errorf("playbook execution: git diff --cached: %w", err)
+		return "", 0, err
 	}
-	if strings.TrimSpace(cachedDiff) == "" {
-		headSha, herr := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
-		if herr != nil {
-			return "", 0, fmt.Errorf("playbook execution: resolve HEAD: %w", herr)
-		}
-		return strings.TrimSpace(headSha), len(content), nil
-	}
-	commitMsg := strings.TrimSpace(message)
-	if commitMsg == "" {
-		commitMsg = "playbook execution: update " + clean
-	}
-	if out, err := r.runGitLocked(ctx, slug, "commit", "-q", "-m", commitMsg); err != nil {
-		return "", 0, fmt.Errorf("playbook execution: git commit: %w: %s", err, out)
-	}
-	sha, err := r.runGitLocked(ctx, slug, "rev-parse", "--short", "HEAD")
-	if err != nil {
-		return "", 0, fmt.Errorf("playbook execution: resolve HEAD: %w", err)
-	}
-	return strings.TrimSpace(sha), len(content), nil
+	return sha, len(content), nil
 }

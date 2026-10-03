@@ -172,7 +172,10 @@ func (r *Repo) Init(ctx context.Context) error {
 	if ok, err := r.isGitRepoLocked(ctx); err != nil {
 		return err
 	} else if ok {
-		return r.ensureLayoutLocked()
+		if err := r.ensureLayoutLocked(); err != nil {
+			return err
+		}
+		return r.untrackRuntimeStateLocked(ctx)
 	}
 
 	if err := os.MkdirAll(r.root, 0o700); err != nil {
@@ -249,8 +252,8 @@ func isGitNotRepositoryOutput(out string) bool {
 		strings.Contains(normalized, "not a git work tree")
 }
 
-// ensureLayoutLocked creates the thematic directories and the .gitignore so
-// index/ regenerates cleanly without tripping git.
+// ensureLayoutLocked creates the thematic directories plus the root
+// .gitignore that keeps runtime state out of the content history.
 // Caller must hold r.mu.
 func (r *Repo) ensureLayoutLocked() error {
 	dirs := []string{
@@ -274,7 +277,81 @@ func (r *Repo) ensureLayoutLocked() error {
 			}
 		}
 	}
+	// The bootstrap and recovery passes below run `git add -A`; without
+	// these rules every fresh instance sweeps runtime state into its very
+	// first commits.
+	if err := mergeGitignoreEntries(filepath.Join(r.root, ".gitignore"), wikiRuntimeStateGitignoreEntries); err != nil {
+		return fmt.Errorf("wiki: write root .gitignore: %w", err)
+	}
 	return r.ensureObsidianVaultLocked()
+}
+
+// wikiRuntimeStateGitignoreEntries are the machine-written runtime stores
+// that live inside the wiki tree but are not wiki content: read telemetry,
+// the entity fact/graph logs, playbook execution logs, the learnings jsonl,
+// and the new-schema fact store. The files stay on disk for their readers —
+// they are just never versioned as articles.
+var wikiRuntimeStateGitignoreEntries = []string{
+	"/.reads/",
+	"/team/entities/",
+	"/team/playbooks/*.executions.jsonl",
+	"/team/learnings/index.jsonl",
+	"/wiki/facts/",
+}
+
+// wikiRuntimeStatePathspecs mirrors wikiRuntimeStateGitignoreEntries as git
+// pathspecs for the probe in untrackRuntimeStateLocked.
+var wikiRuntimeStatePathspecs = []string{
+	".reads",
+	"team/entities",
+	"team/playbooks/*.executions.jsonl",
+	"team/learnings/index.jsonl",
+	"wiki/facts",
+}
+
+// untrackRuntimeStateLocked migrates pre-existing instances: state files
+// committed before the root .gitignore existed are removed from the index
+// in a single labelled commit. Idempotent — once clean, the ls-files probe
+// comes back empty and no commit is made. Files remain on disk; only their
+// membership in the content history changes.
+// Caller must hold r.mu.
+func (r *Repo) untrackRuntimeStateLocked(ctx context.Context) error {
+	probeArgs := append([]string{"ls-files", "-z", "--"}, wikiRuntimeStatePathspecs...)
+	out, err := r.runGitLocked(ctx, "system", probeArgs...)
+	if err != nil {
+		return fmt.Errorf("wiki: runtime-state probe: %w: %s", err, out)
+	}
+	var tracked []string
+	for _, p := range strings.Split(out, "\x00") {
+		if p != "" {
+			tracked = append(tracked, p)
+		}
+	}
+	if len(tracked) == 0 {
+		return nil
+	}
+	rmArgs := append([]string{"rm", "-q", "--cached", "--"}, tracked...)
+	if rmOut, err := r.runGitLocked(ctx, "system", rmArgs...); err != nil {
+		return fmt.Errorf("wiki: untrack runtime state: %w: %s", err, rmOut)
+	}
+	if cOut, err := r.runGitLocked(ctx, "system", "commit", "-q", "-m", "hivex: untrack runtime state from the wiki content repo"); err != nil {
+		return fmt.Errorf("wiki: runtime-state migration commit: %w: %s", err, cOut)
+	}
+	return nil
+}
+
+// headShortLocked resolves the short SHA of HEAD. Runtime-state writers
+// (entity facts, the graph log, playbook executions, fact logs) no longer
+// commit — their files are excluded from the content history — so they
+// report HEAD as their revision, the same shape these paths already
+// returned for byte-identical no-op writes.
+// Caller must hold r.mu.
+func (r *Repo) headShortLocked(ctx context.Context, op string) (string, error) {
+	sha, err := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
+	if err != nil {
+		return "", fmt.Errorf("%s: resolve HEAD: %w", op, err)
+	}
+	return strings.TrimSpace(sha), nil
 }
 
 // Commit writes content for slug @ path, stages, and commits with a per-commit

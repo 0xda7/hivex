@@ -34,7 +34,10 @@ var ghostBriefPathPattern = regexp.MustCompile(`^team/[a-z][a-z0-9-]*/[a-z0-9][a
 var ghostBriefSlugPattern = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
 
 // CommitEntityFact writes the given content to relPath inside the wiki
-// repo and commits it under the supplied slug. Always uses "replace"
+// repo as runtime state — disk-only, never staged or committed
+// (team/entities/ is excluded by the wiki root .gitignore). HEAD is
+// reported so callers keep the response shape these paths already
+// returned for byte-identical no-op writes. Always uses "replace"
 // semantics — the caller owns the merge (the fact log appends in memory
 // and submits the full file bytes).
 func (r *Repo) CommitEntityFact(ctx context.Context, slug, relPath, content, message string) (string, int, error) {
@@ -61,35 +64,11 @@ func (r *Repo) CommitEntityFact(ctx context.Context, slug, relPath, content, mes
 		return "", 0, fmt.Errorf("entity commit: write: %w", err)
 	}
 
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean); err != nil {
-		return "", 0, fmt.Errorf("entity commit: git add: %w: %s", err, out)
-	}
-
-	// Byte-identical re-write is a no-op. Report current HEAD.
-	cachedDiff, err := r.runGitLocked(ctx, slug, "diff", "--cached", "--name-only")
+	sha, err := r.headShortLocked(ctx, "entity commit")
 	if err != nil {
-		return "", 0, fmt.Errorf("entity commit: git diff --cached: %w", err)
+		return "", 0, err
 	}
-	if strings.TrimSpace(cachedDiff) == "" {
-		headSha, herr := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
-		if herr != nil {
-			return "", 0, fmt.Errorf("entity commit: resolve HEAD: %w", herr)
-		}
-		return strings.TrimSpace(headSha), len(content), nil
-	}
-
-	commitMsg := strings.TrimSpace(message)
-	if commitMsg == "" {
-		commitMsg = "fact: update " + clean
-	}
-	if out, err := r.runGitLocked(ctx, slug, "commit", "-q", "-m", commitMsg); err != nil {
-		return "", 0, fmt.Errorf("entity commit: git commit: %w: %s", err, out)
-	}
-	sha, err := r.runGitLocked(ctx, slug, "rev-parse", "--short", "HEAD")
-	if err != nil {
-		return "", 0, fmt.Errorf("entity commit: resolve HEAD: %w", err)
-	}
-	return strings.TrimSpace(sha), len(content), nil
+	return sha, len(content), nil
 }
 
 // lintReportPathPattern validates wiki/.lint/report-YYYY-MM-DD.md paths.
@@ -185,34 +164,12 @@ func (r *Repo) CommitFactLog(ctx context.Context, slug, relPath, content, messag
 		return "", 0, fmt.Errorf("fact commit: write: %w", err)
 	}
 
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean); err != nil {
-		return "", 0, fmt.Errorf("fact commit: git add: %w: %s", err, out)
-	}
-
-	cachedDiff, err := r.runGitLocked(ctx, slug, "diff", "--cached", "--name-only")
+	// Runtime state, not content: disk-only (see CommitEntityFact).
+	sha, err := r.headShortLocked(ctx, "fact commit")
 	if err != nil {
-		return "", 0, fmt.Errorf("fact commit: git diff --cached: %w", err)
+		return "", 0, err
 	}
-	if strings.TrimSpace(cachedDiff) == "" {
-		headSha, herr := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
-		if herr != nil {
-			return "", 0, fmt.Errorf("fact commit: resolve HEAD: %w", herr)
-		}
-		return strings.TrimSpace(headSha), len(content), nil
-	}
-
-	commitMsg := strings.TrimSpace(message)
-	if commitMsg == "" {
-		commitMsg = fmt.Sprintf("lint: mutate fact log %s", relPath)
-	}
-	if out, err := r.runGitLocked(ctx, slug, "commit", "-q", "-m", commitMsg); err != nil {
-		return "", 0, fmt.Errorf("fact commit: git commit: %w: %s", err, out)
-	}
-	sha, err := r.runGitLocked(ctx, slug, "rev-parse", "--short", "HEAD")
-	if err != nil {
-		return "", 0, fmt.Errorf("fact commit: resolve HEAD sha: %w", err)
-	}
-	return strings.TrimSpace(sha), len(content), nil
+	return sha, len(content), nil
 }
 
 // AppendFactLog appends additionalContent to the fact-log file at relPath and
@@ -309,34 +266,12 @@ func (r *Repo) AppendFactLog(ctx context.Context, slug, relPath, additionalConte
 		return "", 0, fmt.Errorf("fact append: close: %w", cerr)
 	}
 
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean); err != nil {
-		return "", 0, fmt.Errorf("fact append: git add: %w: %s", err, out)
-	}
-
-	cachedDiff, err := r.runGitLocked(ctx, slug, "diff", "--cached", "--name-only")
+	// Runtime state, not content: disk-only (see CommitEntityFact).
+	sha, err := r.headShortLocked(ctx, "fact append")
 	if err != nil {
-		return "", 0, fmt.Errorf("fact append: git diff --cached: %w", err)
+		return "", 0, err
 	}
-	if strings.TrimSpace(cachedDiff) == "" {
-		headSha, herr := r.runGitLocked(ctx, "system", "rev-parse", "--short", "HEAD")
-		if herr != nil {
-			return "", 0, fmt.Errorf("fact append: resolve HEAD: %w", herr)
-		}
-		return strings.TrimSpace(headSha), len(buf), nil
-	}
-
-	commitMsg := strings.TrimSpace(message)
-	if commitMsg == "" {
-		commitMsg = fmt.Sprintf("archivist: append fact log %s", relPath)
-	}
-	if out, err := r.runGitLocked(ctx, slug, "commit", "-q", "-m", commitMsg); err != nil {
-		return "", 0, fmt.Errorf("fact append: git commit: %w: %s", err, out)
-	}
-	sha, err := r.runGitLocked(ctx, slug, "rev-parse", "--short", "HEAD")
-	if err != nil {
-		return "", 0, fmt.Errorf("fact append: resolve HEAD sha: %w", err)
-	}
-	return strings.TrimSpace(sha), len(buf), nil
+	return sha, len(buf), nil
 }
 
 // CommitGhostBrief writes a minimal brief for a freshly-minted entity to

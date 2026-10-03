@@ -95,6 +95,12 @@ func writeObsidianAppJSON(path string) error {
 // alone. If it exists but is missing entries, the missing entries are
 // appended — set semantics, never duplicating.
 func writeObsidianGitignore(path string) error {
+	return mergeGitignoreEntries(path, obsidianGitignoreEntries)
+}
+
+// mergeGitignoreEntries writes path so that every entry is present, merging
+// into any existing file without duplicating entries or dropping user lines.
+func mergeGitignoreEntries(path string, entries []string) error {
 	existing, err := os.ReadFile(path)
 	switch {
 	case err == nil:
@@ -123,7 +129,7 @@ func writeObsidianGitignore(path string) error {
 	}
 
 	var missing []string
-	for _, entry := range obsidianGitignoreEntries {
+	for _, entry := range entries {
 		if !present[entry] {
 			missing = append(missing, entry)
 		}
@@ -134,7 +140,7 @@ func writeObsidianGitignore(path string) error {
 
 	if existing == nil {
 		var buf bytes.Buffer
-		for _, entry := range obsidianGitignoreEntries {
+		for _, entry := range entries {
 			buf.WriteString(entry)
 			buf.WriteByte('\n')
 		}

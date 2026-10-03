@@ -35,9 +35,10 @@ const (
 
 var learningLogPathPattern = regexp.MustCompile(`^team/learnings/index\.jsonl$`)
 
-// CommitTeamLearnings writes the merged JSONL log and generated markdown page
-// in one commit. The normal Repo.Commit path rejects .jsonl, so learnings use
-// this narrow path while still regenerating the wiki catalog for index.md.
+// CommitTeamLearnings writes the merged JSONL log (runtime state, disk-only —
+// excluded by the wiki root .gitignore) and commits the generated markdown
+// page. The normal Repo.Commit path rejects .jsonl, so learnings use this
+// narrow path while still regenerating the wiki catalog for index.md.
 func (r *Repo) CommitTeamLearnings(ctx context.Context, slug, relPath, jsonlContent, markdownContent, message string) (string, int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -73,14 +74,16 @@ func (r *Repo) CommitTeamLearnings(ctx context.Context, slug, relPath, jsonlCont
 		return "", 0, fmt.Errorf("team learnings: index regen: %w", err)
 	}
 
-	if out, err := r.runGitLocked(ctx, slug, "add", "--", clean, TeamLearningsPagePath, "index/all.md"); err != nil {
+	// Only the human-facing page and the regenerated catalog are content;
+	// the JSONL log is runtime state and stays out of the history.
+	if out, err := r.runGitLocked(ctx, slug, "add", "--", TeamLearningsPagePath, "index/all.md"); err != nil {
 		return "", 0, fmt.Errorf("team learnings: git add: %w: %s", err, out)
 	}
 	cachedDiff, err := r.runGitLocked(
 		ctx,
 		slug,
 		"diff", "--cached", "--name-only", "--",
-		clean, TeamLearningsPagePath, "index/all.md",
+		TeamLearningsPagePath, "index/all.md",
 	)
 	if err != nil {
 		return "", 0, fmt.Errorf("team learnings: git diff --cached: %w", err)
@@ -101,7 +104,7 @@ func (r *Repo) CommitTeamLearnings(ctx context.Context, slug, relPath, jsonlCont
 		ctx,
 		slug,
 		"commit", "-q", "-m", commitMsg, "--",
-		clean, TeamLearningsPagePath, "index/all.md",
+		TeamLearningsPagePath, "index/all.md",
 	); err != nil {
 		return "", 0, fmt.Errorf("team learnings: git commit: %w: %s", err, out)
 	}
