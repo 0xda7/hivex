@@ -44,7 +44,7 @@ permissions:
   contents: write # create/upload to the Release
 
 env:
-  WAILS_VERSION: v2.12.0
+  WAILS_VERSION: v2.15.0
 
 jobs:
   # ---------------------------------------------------------------- macOS ----
