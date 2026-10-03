@@ -52,7 +52,7 @@ jobs:
     runs-on: macos-14 # Apple Silicon
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # ratchet:actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v4
 
       - name: Free disk space for DMG packaging
         # macos-14 runners ship near-full; `hdiutil create` for the universal
@@ -115,7 +115,7 @@ jobs:
           esac
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # ratchet:actions/setup-go@v5
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # ratchet:actions/setup-go@v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -253,7 +253,7 @@ jobs:
           done
           echo "::error::release $TAG not created within 15m; refusing to upload a partial release"; exit 1
 
-      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # ratchet:softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # ratchet:softprops/action-gh-release@v3.0.3
         with:
           tag_name: ${{ steps.ver.outputs.tag }}
           files: dist/hivebot-*.dmg
@@ -267,8 +267,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # ratchet:actions/checkout@v4
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # ratchet:actions/setup-go@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v4
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # ratchet:actions/setup-go@v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -343,7 +343,7 @@ jobs:
       # Azure Trusted Signing — only runs when the AZURE_* secrets are present.
       - name: Sign (Azure Trusted Signing)
         if: steps.azure.outputs.enabled == 'true'
-        uses: azure/trusted-signing-action@07c81171dd46a04e1b9f382b6c693815828bbbf7 # ratchet:azure/trusted-signing-action@v0.5.0
+        uses: azure/trusted-signing-action@c7ab2a863ab5f9a846ddb8265964877ef296ee82 # ratchet:azure/trusted-signing-action@v2.0.0
         with:
           azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -400,7 +400,7 @@ jobs:
           done
           echo "::error::release $TAG not created within 15m; refusing to upload a partial release"; exit 1
 
-      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # ratchet:softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # ratchet:softprops/action-gh-release@v3.0.3
         with:
           tag_name: ${{ steps.ver.outputs.tag }}
           files: dist/hivebot-*-setup.exe
